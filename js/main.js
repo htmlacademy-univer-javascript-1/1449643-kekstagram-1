@@ -1,4 +1,4 @@
-import { faker } from '@faker-js/faker';
+import { faker } from 'https://cdn.skypack.dev/@faker-js/faker';
 
 function getRandomPositiveInteger(a, b) {
   const lower = Math.ceil(Math.min(Math.abs(a), Math.abs(b)));
