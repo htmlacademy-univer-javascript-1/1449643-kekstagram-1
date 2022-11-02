@@ -1,2 +1,3 @@
-import './util.js';
-import './data.js';
+import {renderPictures} from './pictures.js';
+
+renderPictures();
