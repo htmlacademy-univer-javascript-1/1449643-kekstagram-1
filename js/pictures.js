@@ -1,23 +1,31 @@
-import {createPhotos} from './data.js';
+import {arrayOfPhotos} from './data.js';
+import {openPictureModal} from './big-picture.js';
 
 const picturesListElement = document.querySelector('.pictures');
 const picturesFragment = document.createDocumentFragment();
 const photoTemplate = document.querySelector('#picture').content.querySelector('.picture');
 
 const appendPicture = (picture) => {
-  const {img, likes, comments} = picture;
+  const {id, url, likes, comments} = picture;
   const pictureElement = photoTemplate.cloneNode(true);
 
-  pictureElement.querySelector('.picture__img').src = img;
+  pictureElement.querySelector('.picture__img').src = url;
   pictureElement.querySelector('.picture__likes').textContent = likes;
   pictureElement.querySelector('.picture__comments').textContent = comments.length;
-
+  pictureElement.dataset.id = id;
   picturesFragment.appendChild(pictureElement);
 };
 
 const renderPictures = () => {
-  createPhotos().forEach(appendPicture);
+  arrayOfPhotos.forEach(appendPicture);
   picturesListElement.appendChild(picturesFragment);
+  picturesListElement.addEventListener('click', (evt) => {
+    const pictureElement = evt.target.closest('.picture');
+    if (pictureElement) {
+      const clickedPicture = arrayOfPhotos.find(({id}) => Number(pictureElement.dataset.id) === id);
+      openPictureModal(clickedPicture);
+    }
+  });
 };
 
 export {renderPictures};
