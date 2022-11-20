@@ -52,4 +52,3 @@ const openPictureModal = ({url, likes,comments, description}) => {
 };
 
 export {openPictureModal};
-
