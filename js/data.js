@@ -4,6 +4,7 @@ import {getRandomPositiveInteger} from './utils.js';
 const PHOTOS_NUMBER = 25;
 const MIN_LIKES_NUMBER  = 15;
 const MAX_LIKES_NUMBER  = 200;
+const MAX_COMMENTS_NUMBER  = 100;
 const MAX_AVATAR_NUM = 6;
 
 const MESSAGES = [
@@ -34,7 +35,7 @@ const createPhotoDescription = () => ({
   url: `photos/${photoDescriptionIndex}.jpg`,
   description: faker.lorem.paragraph(),
   likes: getRandomPositiveInteger(MIN_LIKES_NUMBER, MAX_LIKES_NUMBER),
-  comments: Array.from({length: getRandomPositiveInteger(1,5)}, createComment)
+  comments: Array.from({length: getRandomPositiveInteger(1,MAX_COMMENTS_NUMBER)}, createComment)
 });
 
 const arrayOfPhotos = Array.from({length: PHOTOS_NUMBER}, createPhotoDescription);

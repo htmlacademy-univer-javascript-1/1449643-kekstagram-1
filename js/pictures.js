@@ -8,7 +8,6 @@ const photoTemplate = document.querySelector('#picture').content.querySelector('
 const appendPicture = (picture) => {
   const {id, url, likes, comments} = picture;
   const pictureElement = photoTemplate.cloneNode(true);
-
   pictureElement.querySelector('.picture__img').src = url;
   pictureElement.querySelector('.picture__likes').textContent = likes;
   pictureElement.querySelector('.picture__comments').textContent = comments.length;

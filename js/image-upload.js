@@ -69,7 +69,10 @@ const closeOverlay = () => {
 };
 
 const onEscKeydown = (evt) => {
-  if (isEscKey(evt.key) && evt.target !== textHashtags && evt.target !== textDescription) {closeOverlay();}
+  if (isEscKey(evt.key) && evt.target !== textHashtags && evt.target !== textDescription) {
+    evt.preventDefault();
+    closeOverlay();
+  }
 };
 
 fileUploadButton.addEventListener('change', () => {
