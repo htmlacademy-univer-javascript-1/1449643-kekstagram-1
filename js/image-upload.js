@@ -59,9 +59,6 @@ imageUploadForm.addEventListener('submit', (evt) => {
 
 const closeOverlay = () => {
   imageUploadForm.reset();
-  //fileUploadButton.value = '';
-  //textDescription.value = '';
-  //textHashtags.value = '';
   overlay.classList.add('hidden');
   document.body.classList.remove('modal-open');
 };
