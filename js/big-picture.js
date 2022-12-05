@@ -1,5 +1,8 @@
 import { isEscKey } from './utils.js';
 
+const NUMBER_OF_INITIAL_COMMENTS = 5;
+const NUMBER_OF_COMMENTS_TO_RENDER = 5;
+
 const pictureModalElement =  document.querySelector('.big-picture');
 const commentCountLement = document.querySelector('.comments-count');
 const imageElement = document.querySelector('.big-picture__img img');
@@ -23,8 +26,8 @@ const renderComment = (comment) => {
   commentListElement.appendChild(commentElement);
 };
 
-function renderComments (numberOfComments)  {
-  numberOfComments = typeof numberOfComments === 'undefined' ? numberOfComments : 5;
+const renderComments = (numberOfComments) => {
+  numberOfComments = typeof numberOfComments === 'undefined' ? numberOfComments : NUMBER_OF_COMMENTS_TO_RENDER;
   do  {
     renderComment(currentComments[commentsRendered]);
     commentsRendered++;
@@ -32,7 +35,11 @@ function renderComments (numberOfComments)  {
   } while (numberOfComments > 0 && commentsRendered !== currentCommentsNumber);
   if (commentsRendered === currentCommentsNumber) {commentsLoaderElement.classList.add('hidden');}
   currentCommentsCountElement.textContent = `Показано ${commentsRendered} из ${currentCommentsNumber} комментариев`;
-}
+};
+
+const onLoadClick = () => {
+  renderComments();
+};
 
 const closePictureModal =  () => {
   pictureModalElement.classList.add('hidden');
@@ -65,13 +72,13 @@ const openPictureModal = ({url, likes, comments, description}) => {
   commentsRendered = 0;
   currentComments = comments;
   currentCommentsNumber = currentComments.length;
-  if (comments.length <= 5) {
+  if (comments.length <= NUMBER_OF_INITIAL_COMMENTS) {
     commentsLoaderElement.classList.add('hidden');
   } else {
     commentsLoaderElement.classList.remove('hidden');
-    commentsLoaderElement.addEventListener('click', renderComments);
+    commentsLoaderElement.addEventListener('click', onLoadClick);
   }
-  const initialCommentsNumber = currentCommentsNumber <= 5 ? currentCommentsNumber : 5;
+  const initialCommentsNumber = currentCommentsNumber <= NUMBER_OF_INITIAL_COMMENTS ? currentCommentsNumber : NUMBER_OF_INITIAL_COMMENTS;
   renderComments(initialCommentsNumber);
   document.addEventListener('keydown', onPictureModalKeydown);
   buttonCloseElement.addEventListener('click', onPictureModalCloseClick, {once: true});
