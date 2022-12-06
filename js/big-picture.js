@@ -26,8 +26,8 @@ const renderComment = (comment) => {
   commentListElement.appendChild(commentElement);
 };
 
-const renderComments = (numberOfComments) => {
-  numberOfComments = typeof numberOfComments === 'undefined' ? numberOfComments : NUMBER_OF_COMMENTS_TO_RENDER;
+const renderComments = (number) => {
+  let numberOfComments = typeof number === 'undefined' ? NUMBER_OF_COMMENTS_TO_RENDER : number;
   do  {
     renderComment(currentComments[commentsRendered]);
     commentsRendered++;
@@ -47,18 +47,19 @@ const closePictureModal =  () => {
   currentCommentsCountElement.classList.add('hidden');
   commentsLoaderElement.classList.add('hidden');
   commentsLoaderElement.removeEventListener('click', renderComments);
+  document.removeEventListener('keydown', onPictureModalKeydown);
 };
 
 const onPictureModalCloseClick = () => {
   closePictureModal();
 };
 
-const onPictureModalKeydown = (evt) => {
+function onPictureModalKeydown (evt) {
   if(isEscKey(evt.key)) {
     evt.preventDefault();
     closePictureModal();
   }
-};
+}
 
 const openPictureModal = ({url, likes, comments, description}) => {
   document.body.classList.add('modal-open');
