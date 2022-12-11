@@ -1,4 +1,4 @@
-import {arrayOfPhotos} from './data.js';
+// import {arrayOfPhotos} from './data.js';
 import {openPictureModal} from './big-picture.js';
 
 const picturesListElement = document.querySelector('.pictures');
@@ -15,13 +15,13 @@ const appendPicture = (picture) => {
   picturesFragment.appendChild(pictureElement);
 };
 
-const renderPictures = () => {
-  arrayOfPhotos.forEach(appendPicture);
+const renderPictures = (photos) => {
+  photos.forEach(appendPicture);
   picturesListElement.appendChild(picturesFragment);
   picturesListElement.addEventListener('click', (evt) => {
     const pictureElement = evt.target.closest('.picture');
     if (pictureElement) {
-      const clickedPicture = arrayOfPhotos.find(({id}) => Number(pictureElement.dataset.id) === id);
+      const clickedPicture = photos.find(({id}) => Number(pictureElement.dataset.id) === id);
       openPictureModal(clickedPicture);
     }
   });
