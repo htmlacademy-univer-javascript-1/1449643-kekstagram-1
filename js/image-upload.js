@@ -1,4 +1,5 @@
 import {isEscKey} from './utils.js';
+import {sendDataToServer} from './network.js';
 
 const MAX_HASHTAGS_NUM = 5;
 const MAX_COMMENT_LENGTH = 140;
@@ -56,12 +57,14 @@ const EFFECTS = {
   },
 };
 
+const body = document.querySelector('body');
 const fileUploadButton = document.querySelector('#upload-file');
 const overlay = document.querySelector('.img-upload__overlay');
 const imageUploadForm = document.querySelector('.img-upload__form');
 const textHashtags = imageUploadForm.querySelector('.text__hashtags');
 const textDescription = imageUploadForm.querySelector('.text__description');
 const closeFormButton = document.querySelector('#upload-cancel');
+const submitButton = imageUploadForm.querySelector('.img-upload__submit');
 
 const effectLevelSlider = overlay.querySelector('.effect-level__slider');
 const effectLevelValue = overlay.querySelector('.effect-level__value');
@@ -70,6 +73,11 @@ const scaleControlSmaller = overlay.querySelector('.scale__control--smaller');
 const scaleControlBigger = overlay.querySelector('.scale__control--bigger');
 const scaleControlValue = overlay.querySelector('.scale__control--value');
 const imageUploadPreview = overlay.querySelector('.img-upload__preview');
+
+const success = document.querySelector('#success').content.querySelector('.success');
+const error = document.querySelector('#error').content.querySelector('.error');
+const successButton = success.querySelector('.success__button');
+const errorButton = error.querySelector('.error__button');
 
 const hasDuplicates = (hashtags) => new Set(hashtags).size !== hashtags.length;
 
@@ -100,24 +108,15 @@ const pristine = new Pristine(imageUploadForm, {
 
 pristine.addValidator(
   textHashtags,
-  checkHashtags,
+  (value) => checkHashtags(value),
   'Некорректно указаны хештэги'
 );
 
 pristine.addValidator(
   textDescription,
-  checkComments,
+  (value) => checkComments(value),
   `Максимальная длина комментария ${MAX_COMMENT_LENGTH} символов`
 );
-
-const onFormSubmit = (evt) => {
-  const isValid = pristine.validate();
-  if(!isValid) {
-    evt.preventDefault();
-  }
-};
-
-imageUploadForm.addEventListener('submit', onFormSubmit);
 
 // масштаб
 
@@ -175,7 +174,79 @@ const onSliderUpdate = () => {
     : '';
 };
 
-const closeOverlay = () => {
+// submit
+
+const disableSubmitButton = () => {
+  submitButton.textContent = 'Подождите...';
+  submitButton.disabled = true;
+};
+
+const enableSubmitButton = () => {
+  submitButton.textContent = 'Опубликовать';
+  submitButton.disabled = false;
+};
+
+const closeSuccessErrorMessages = () => {
+  if (body.contains(error)) {
+    body.removeChild(error);
+    overlay.classList.remove('hidden');
+  }
+  if (body.contains(success)) {
+    body.removeChild(success);
+  }
+  document.removeEventListener('keydown', onEscKeydownError);
+  document.removeEventListener('click', onClickSuccess);
+  successButton.removeEventListener('click', closeSuccessErrorMessages);
+  document.removeEventListener('click', onClickError);
+  errorButton.removeEventListener('click', closeSuccessErrorMessages);
+};
+
+function onClickSuccess (evt) {
+  if (evt.target === success) {
+    closeSuccessErrorMessages();
+  }
+}
+
+function onClickError (evt) {
+  if (evt.target === error) {
+    closeSuccessErrorMessages();
+  }
+}
+
+function onEscKeydownError (evt) {
+  if (isEscKey(evt.key)) {
+    closeSuccessErrorMessages();
+  }
+}
+
+const onFormSubmit = (evt) => {
+  evt.preventDefault();
+  const isValid = pristine.validate();
+  if (isValid) {
+    disableSubmitButton();
+    sendDataToServer(
+      () => {
+        closeOverlay();
+        enableSubmitButton();
+        document.addEventListener('keydown', onEscKeydownError);
+        document.addEventListener('click', onClickSuccess);
+        successButton.addEventListener('click', closeSuccessErrorMessages);
+        body.appendChild(success);
+      },
+      () => {
+        overlay.classList.add('hidden');
+        enableSubmitButton();
+        document.addEventListener('keydown', onEscKeydownError);
+        document.addEventListener('click', onClickError);
+        errorButton.addEventListener('click', closeSuccessErrorMessages);
+        body.appendChild(error);
+      },
+      new FormData(evt.target),
+    );
+  }
+};
+
+function closeOverlay () {
   imageUploadForm.reset();
   overlay.classList.add('hidden');
   document.body.classList.remove('modal-open');
@@ -188,10 +259,12 @@ const closeOverlay = () => {
   document.body.classList.remove('modal-open');
   effectLevelSlider.noUiSlider.destroy();
   pristine.destroy();
-};
+}
+
+imageUploadForm.addEventListener('submit', onFormSubmit);
 
 function onEscKeydown (evt)  {
-  if (isEscKey(evt.key) && evt.target !== textHashtags && evt.target !== textDescription) {
+  if (isEscKey(evt.key) && evt.target !== textHashtags && evt.target !== textDescription && !body.contains(error)) {
     evt.preventDefault();
     closeOverlay();
   }
