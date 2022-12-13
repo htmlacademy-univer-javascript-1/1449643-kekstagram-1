@@ -49,7 +49,13 @@ const renderPictures = (pictures) => {
   picturesListElement.addEventListener('click', (evt) => {
     const pictureElement = evt.target.closest('.picture');
     if (pictureElement) {
+<<<<<<< Updated upstream
       const clickedPicture = pictures.find(({id}) => Number(pictureElement.dataset.id) === id);
+=======
+      const clickedPicture = photos.find(({id}) => Number(pictureElement.dataset.id) === id);
+      // eslint-disable-next-line no-console
+      console.log(clickedPicture);
+>>>>>>> Stashed changes
       openPictureModal(clickedPicture);
     }
   });
