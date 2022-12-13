@@ -1,31 +1,35 @@
-import {renderPictures} from './pictures.js';
+import {renderPictures, setFilterDefault, switchFilter} from './pictures.js';
 import './image-upload.js';
 import {getDataFromServer} from './network.js';
 
 const body = document.querySelector('body');
+const imgFilters = document.querySelector('.img-filters');
 
 const showDownloadErrorMessage = () => {
-  const errorDiv = document.createElement('div');
-  errorDiv.style.zIndex = '50';
-  errorDiv.style.backgroundColor = 'rgba(65, 65, 65)';
-  errorDiv.style.position = 'fixed';
-  errorDiv.style.left = '35%';
-  errorDiv.style.top = '35%';
-  errorDiv.style.width = '30%';
-  errorDiv.style.height = '30%';
-  errorDiv.style.display = 'flex';
-  errorDiv.style.alignItems = 'center';
-  errorDiv.style.fontSize = '22px';
-  errorDiv.style.lineHeight = '1.5';
-  errorDiv.style.textAlign = 'center';
-  errorDiv.style.color = '#e9dc45';
-  errorDiv.style.borderRadius = '15px';
-  errorDiv.textContent = 'Что-то пошло не так! Проверьте подключение к Интернету и перезагрузите страницу.';
-  body.appendChild(errorDiv);
+  const errorMessageDiv = document.createElement('div');
+  errorMessageDiv.style.alignItems = 'center';
+  errorMessageDiv.style.fontSize = '22px';
+  errorMessageDiv.style.lineHeight = '1.5';
+  errorMessageDiv.style.textAlign = 'center';
+  errorMessageDiv.style.zIndex = '50';
+  errorMessageDiv.style.backgroundColor = 'rgba(65, 65, 65)';
+  errorMessageDiv.style.position = 'fixed';
+  errorMessageDiv.style.left = '35%';
+  errorMessageDiv.style.top = '35%';
+  errorMessageDiv.style.width = '30%';
+  errorMessageDiv.style.height = '30%';
+  errorMessageDiv.style.display = 'flex';
+  errorMessageDiv.style.color = '#e9dc45';
+  errorMessageDiv.style.borderRadius = '15px';
+  errorMessageDiv.textContent = 'Что-то пошло не так! Проверьте подключение к Интернету и перезагрузите страницу.';
+  body.appendChild(errorMessageDiv);
 };
 
 getDataFromServer((pictures) => {
+  imgFilters.classList.remove('img-filters--inactive');
   renderPictures(pictures);
+  switchFilter(pictures);
+  setFilterDefault(pictures);
 },
 () => {
   showDownloadErrorMessage();
