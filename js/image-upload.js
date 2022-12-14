@@ -9,6 +9,8 @@ const SCALE_STEP = 25;
 
 const REGEX_VALID_HASHTAG = /(^#[0-9А-Яа-яЁёA-Za-z]{1,19}$)/; // корректный хештэг
 
+const FILE_TYPES_ALLOWED = ['jpg', 'jpeg', 'png','gif'];
+
 const EFFECTS = {
   'chrome': {
     filterName: 'grayscale',
@@ -79,7 +81,20 @@ const errorMessage = document.querySelector('#error').content.querySelector('.er
 const successButton = successMessage.querySelector('.success__button');
 const errorButton = errorMessage.querySelector('.error__button');
 
+const fileInput = document.querySelector('input[type=file]');
+const imgUploadPreview = document.querySelector('.img-upload__preview').querySelector('img');
+
 let currentEffect;
+
+// загрузка изображения
+
+fileInput.addEventListener('change', () => {
+  const file = fileInput.files[0];
+  const name = file.name.toLowerCase();
+  if (FILE_TYPES_ALLOWED.some((it) => name.endsWith(it))) {
+    imgUploadPreview.src = URL.createObjectURL(file);
+  }
+});
 
 // валидация
 
@@ -162,7 +177,6 @@ const onChangeEffects = (evt) => {
     start: max,
     step,
   });
-  imageUploadPreview.className = 'img-upload__preview';
   const effectsPreview = evt.target.parentNode.querySelector('.effects__preview');
   imageUploadPreview.classList.add(effectsPreview.getAttribute('class').split('  ')[1]);
 };
@@ -293,7 +307,6 @@ fileUploadButton.addEventListener('change', () => {
     }
   );
   currentEffect = 'effect-none';
-  imageUploadPreview.className = 'img-upload__preview';
   imageUploadPreview.classList.add('effects__preview--none');
   imageUploadForm.addEventListener('change', onChangeEffects);
   effectLevelSlider.noUiSlider.on('update', onSliderUpdate);
