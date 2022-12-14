@@ -1,9 +1,8 @@
-import {renderPictures, setFilterDefault, switchFilter} from './pictures.js';
 import './image-upload.js';
+import {initializeFilters} from './pictures.js';
 import {getDataFromServer} from './network.js';
 
 const body = document.querySelector('body');
-const imgFilters = document.querySelector('.img-filters');
 
 const showDownloadErrorMessage = () => {
   const errorMessageDiv = document.createElement('div');
@@ -26,10 +25,7 @@ const showDownloadErrorMessage = () => {
 };
 
 getDataFromServer((pictures) => {
-  imgFilters.classList.remove('img-filters--inactive');
-  renderPictures(pictures);
-  switchFilter(pictures);
-  setFilterDefault(pictures);
+  initializeFilters(pictures);
 },
 () => {
   showDownloadErrorMessage();
