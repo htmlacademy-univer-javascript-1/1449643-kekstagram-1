@@ -9,5 +9,25 @@ const checkStringLength = (string, length) => string.length <= length;
 
 const isEscKey = (key) => key === 'Escape';
 
+const debounce = (callback, timeoutDelay = 500) => {
+  let timeoutId;
 
-export { getRandomPositiveInteger, checkStringLength, isEscKey };
+  return (...rest) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => callback.apply(this, rest), timeoutDelay);
+  };
+};
+
+const throttle = (callback, delayBetweenFrames) => {
+  let lastTime = 0;
+
+  return (...rest) => {
+    const now = new Date();
+    if (now - lastTime >= delayBetweenFrames) {
+      callback.apply(this, rest);
+      lastTime = now;
+    }
+  };
+};
+
+export { getRandomPositiveInteger, checkStringLength, isEscKey, debounce, throttle };

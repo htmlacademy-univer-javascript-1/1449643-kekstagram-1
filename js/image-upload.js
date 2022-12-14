@@ -74,10 +74,14 @@ const scaleControlBigger = overlay.querySelector('.scale__control--bigger');
 const scaleControlValue = overlay.querySelector('.scale__control--value');
 const imageUploadPreview = overlay.querySelector('.img-upload__preview');
 
-const success = document.querySelector('#success').content.querySelector('.success');
-const error = document.querySelector('#error').content.querySelector('.error');
-const successButton = success.querySelector('.success__button');
-const errorButton = error.querySelector('.error__button');
+const successMessage = document.querySelector('#success').content.querySelector('.success');
+const errorMessage = document.querySelector('#error').content.querySelector('.error');
+const successButton = successMessage.querySelector('.success__button');
+const errorButton = errorMessage.querySelector('.error__button');
+
+let currentEffect;
+
+// валидация
 
 const hasDuplicates = (hashtags) => new Set(hashtags).size !== hashtags.length;
 
@@ -143,8 +147,6 @@ const onScaleControlSmallerClick = () => {
 
 // эффекты
 
-let currentEffect;
-
 const onChangeEffects = (evt) => {
   currentEffect = evt.target.value;
   const effectConfig = EFFECTS[currentEffect];
@@ -174,7 +176,7 @@ const onSliderUpdate = () => {
     : '';
 };
 
-// submit
+// отправка формы
 
 const disableSubmitButton = () => {
   submitButton.textContent = 'Подождите...';
@@ -187,12 +189,12 @@ const enableSubmitButton = () => {
 };
 
 const closeSuccessErrorMessages = () => {
-  if (body.contains(error)) {
-    body.removeChild(error);
+  if (body.contains(errorMessage)) {
+    body.removeChild(errorMessage);
     overlay.classList.remove('hidden');
   }
-  if (body.contains(success)) {
-    body.removeChild(success);
+  if (body.contains(successMessage)) {
+    body.removeChild(successMessage);
   }
   document.removeEventListener('keydown', onEscKeydownError);
   document.removeEventListener('click', onClickSuccess);
@@ -202,13 +204,13 @@ const closeSuccessErrorMessages = () => {
 };
 
 function onClickSuccess (evt) {
-  if (evt.target === success) {
+  if (evt.target === successMessage) {
     closeSuccessErrorMessages();
   }
 }
 
 function onClickError (evt) {
-  if (evt.target === error) {
+  if (evt.target === errorMessage) {
     closeSuccessErrorMessages();
   }
 }
@@ -219,7 +221,20 @@ function onEscKeydownError (evt) {
   }
 }
 
-const onFormSubmit = (evt) => {
+const closeOverlay = () => {
+  imageUploadForm.reset();
+  overlay.classList.add('hidden');
+  document.body.classList.remove('modal-open');
+
+  scaleControlSmaller.removeEventListener('click', onScaleControlSmallerClick);
+  scaleControlBigger.removeEventListener('click', onScaleControlBiggerClick);
+
+  imageUploadForm.removeEventListener('change', onChangeEffects);
+  document.removeEventListener('keydown', onEscKeydown);
+  effectLevelSlider.noUiSlider.destroy();
+};
+
+imageUploadForm.addEventListener('submit', (evt) => {
   evt.preventDefault();
   const isValid = pristine.validate();
   if (isValid) {
@@ -231,7 +246,7 @@ const onFormSubmit = (evt) => {
         document.addEventListener('keydown', onEscKeydownError);
         document.addEventListener('click', onClickSuccess);
         successButton.addEventListener('click', closeSuccessErrorMessages);
-        body.appendChild(success);
+        body.appendChild(successMessage);
       },
       () => {
         overlay.classList.add('hidden');
@@ -239,32 +254,15 @@ const onFormSubmit = (evt) => {
         document.addEventListener('keydown', onEscKeydownError);
         document.addEventListener('click', onClickError);
         errorButton.addEventListener('click', closeSuccessErrorMessages);
-        body.appendChild(error);
+        body.appendChild(errorMessage);
       },
       new FormData(evt.target),
     );
   }
-};
+});
 
-function closeOverlay () {
-  imageUploadForm.reset();
-  overlay.classList.add('hidden');
-  document.body.classList.remove('modal-open');
-  scaleControlSmaller.removeEventListener('click', onScaleControlSmallerClick);
-  scaleControlBigger.removeEventListener('click', onScaleControlBiggerClick);
-  imageUploadForm.removeEventListener('change', onChangeEffects);
-  document.removeEventListener('keydown', onEscKeydown);
-  imageUploadForm.removeEventListener('submit', onFormSubmit);
-  overlay.classList.add('hidden');
-  document.body.classList.remove('modal-open');
-  effectLevelSlider.noUiSlider.destroy();
-  pristine.destroy();
-}
-
-imageUploadForm.addEventListener('submit', onFormSubmit);
-
-function onEscKeydown (evt)  {
-  if (isEscKey(evt.key) && evt.target !== textHashtags && evt.target !== textDescription && !body.contains(error)) {
+function onEscKeydown (evt) {
+  if (isEscKey(evt.key) && evt.target !== textHashtags && evt.target !== textDescription && !body.contains(errorMessage)) {
     evt.preventDefault();
     closeOverlay();
   }
@@ -301,5 +299,4 @@ fileUploadButton.addEventListener('change', () => {
   effectLevelSlider.noUiSlider.on('update', onSliderUpdate);
   imageUploadEffectLevel.classList.add('hidden');
   imageUploadPreview.style.transform = 'scale(1)';
-  imageUploadPreview.style.filter = 'none';
 });
